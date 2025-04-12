@@ -132,13 +132,30 @@ class WhatsAppWebhookController extends Controller
             return response()->json(['status' => 'WhatsApp API credentials missing for this chatbot'], 500);
         }
 
-        $sendResponse = Http::withToken($whatsappAccessToken)
-            ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", [
+        // Detect if reply is an image URL
+        $isImage = false;
+        if (is_string($reply) && preg_match('/\.(jpg|jpeg|png|gif)$/i', $reply) && filter_var($reply, FILTER_VALIDATE_URL)) {
+            $isImage = true;
+        }
+
+        if ($isImage) {
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'to' => $from,
+                'type' => 'image',
+                'image' => ['link' => $reply],
+            ];
+        } else {
+            $payload = [
                 'messaging_product' => 'whatsapp',
                 'to' => $from,
                 'type' => 'text',
                 'text' => ['body' => $reply],
-            ]);
+            ];
+        }
+
+        $sendResponse = Http::withToken($whatsappAccessToken)
+            ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
 
         Log::info('WhatsApp Webhook: Sent reply to WhatsApp user', [
             'to' => $from,
