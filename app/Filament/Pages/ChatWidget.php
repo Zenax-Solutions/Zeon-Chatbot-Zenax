@@ -27,8 +27,9 @@ class ChatWidget extends Page
     public function mount()
     {
         $user = Auth::user();
-        $this->sessions = ChatSession::where('user_id', $user->id)->orderBy('updated_at')->get();
-
+        $this->sessions = ChatSession::where('user_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
         $sessionId = request()->query('session');
         if ($sessionId) {
             $this->selectedSession = ChatSession::where('user_id', $user->id)->find($sessionId);
