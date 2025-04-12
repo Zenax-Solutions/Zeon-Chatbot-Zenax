@@ -23,5 +23,8 @@ class Kernel extends ConsoleKernel
     {
         // Schedule the OpenRouter uptime check every 5 minutes
         $schedule->command('openrouter:check-uptime')->everyFiveMinutes();
+
+        // Schedule WhatsApp token refresh every 15 minutes
+        $schedule->command('whatsapp:refresh-tokens')->everyFifteenMinutes();
     }
 }
