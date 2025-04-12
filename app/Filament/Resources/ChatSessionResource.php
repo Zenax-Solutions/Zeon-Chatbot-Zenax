@@ -31,7 +31,7 @@ class ChatSessionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('id')->sortable()->label('Session ID'),
                 Tables\Columns\TextColumn::make('user.name')->label('User')->sortable(),
                 Tables\Columns\TextColumn::make('chatBot.website_name')->label('ChatBot')->sortable(),
                 Tables\Columns\TextColumn::make('title')->limit(30),
