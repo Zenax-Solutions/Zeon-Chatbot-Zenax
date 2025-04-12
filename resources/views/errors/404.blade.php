@@ -15,7 +15,7 @@
         <!-- Modal Content -->
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center animate-fade-in">
             <div class="flex flex-col items-center">
-                <svg class="w-20 h-20 text-purple-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
+                <svg class="w-20 h-20 text-cyan-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
                     <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="3" fill="#f3e8ff" />
                     <path d="M16 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" />
                     <rect x="21" y="28" width="6" height="6" rx="3" fill="#a78bfa" />
