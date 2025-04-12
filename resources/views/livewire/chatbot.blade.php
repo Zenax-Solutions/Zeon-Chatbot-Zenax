@@ -29,6 +29,7 @@ new class extends Component
         $this->user = $user;
         $this->website = $website;
 
+        $this->dispatch('scroll-chat');
 
         // Use Laravel session for chat session isolation
         $chatSessionId = session('chat_session_id');
@@ -63,8 +64,6 @@ new class extends Component
                 ];
             })
             ->toArray();
-
-        $this->dispatch('scroll-chat');
 
         // If no messages, show welcome
         if (empty($this->messages)) {
