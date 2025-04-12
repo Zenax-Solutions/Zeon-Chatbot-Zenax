@@ -11,8 +11,12 @@ use App\Models\ChatMessage;
 class ChatWidget extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
-    protected static ?string $navigationLabel = 'Chat Widget';
-    protected static ?string $navigationGroup = 'Chat';
+    protected static ?string $navigationLabel = 'Chat List';
+    protected static ?string $navigationGroup = 'ChatBot';
+    protected static ?string $slug = 'chat-list';
+    protected static ?int $navigationSort = 99;
+
+
 
     protected static string $view = 'filament.pages.chat-widget';
 

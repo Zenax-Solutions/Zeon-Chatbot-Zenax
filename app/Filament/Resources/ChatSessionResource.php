@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ChatSessionResource extends Resource
@@ -18,6 +19,9 @@ class ChatSessionResource extends Resource
     protected static ?string $model = ChatSession::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationSort = 100;
+    protected static ?string $navigationGroup = 'ChatBot';
+    protected static ?string $label = 'Chat Sessions';
 
     public static function form(Form $form): Form
     {
@@ -76,6 +80,13 @@ class ChatSessionResource extends Resource
     {
         return false;
     }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+
 
     public static function getEloquentQuery(): Builder
     {

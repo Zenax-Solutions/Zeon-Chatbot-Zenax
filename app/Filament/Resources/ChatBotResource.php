@@ -19,7 +19,7 @@ class ChatBotResource extends Resource
 {
     protected static ?string $model = ChatBot::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static ?string $navigationIcon = 'heroicon-o-cube-transparent';
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationGroup = 'ChatBot';
 
