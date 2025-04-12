@@ -292,22 +292,9 @@ new class extends Component
                 </div>
                 @else
                 <div class="flex items-end justify-end gap-4">
-                    <div class="bg-blue-500 p-3 rounded-lg animate-fade-in transition-all duration-300">
+                    <div class="bg-cyan-500 p-3 rounded-lg animate-fade-in transition-all duration-300">
                         <p class="text-sm text-white">{{ $msg['content'] }}</p>
                     </div>
-                    <svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30px" height="30px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve" fill="#000000">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <g>
-                                <g>
-                                    <path fill="#394240" d="M63.329,57.781C62.954,57.219,53.892,44,31.999,44C10.112,44,1.046,57.219,0.671,57.781 c-1.223,1.84-0.727,4.32,1.109,5.547c1.836,1.223,4.32,0.727,5.547-1.109C7.397,62.117,14.347,52,31.999,52 c17.416,0,24.4,9.828,24.674,10.219C57.446,63.375,58.712,64,60.009,64c0.758,0,1.531-0.219,2.211-0.672 C64.056,62.102,64.556,59.621,63.329,57.781z"></path>
-                                    <path fill="#394240" d="M31.999,40c8.836,0,16-7.16,16-16v-8c0-8.84-7.164-16-16-16s-16,7.16-16,16v8 C15.999,32.84,23.163,40,31.999,40z M23.999,16c0-4.418,3.586-8,8-8c4.422,0,8,3.582,8,8v8c0,4.418-3.578,8-8,8 c-4.414,0-8-3.582-8-8V16z"></path>
-                                </g>
-                                <path fill="#F9EBB2" d="M23.999,16c0-4.418,3.586-8,8-8c4.422,0,8,3.582,8,8v8c0,4.418-3.578,8-8,8c-4.414,0-8-3.582-8-8V16z"></path>
-                            </g>
-                        </g>
-                    </svg>
                 </div>
                 @endif
             </div>
@@ -341,7 +328,7 @@ new class extends Component
                     class="flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] text-[#030712] focus-visible:ring-offset-2"
                     placeholder="Type your message" />
                 <button type="submit"
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] bg-black hover:bg-[#111827E6] h-10 px-4 py-2">
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] bg-cyan-700 hover:bg-[#111827E6] h-10 px-4 py-2">
                     Send
                 </button>
             </form>
