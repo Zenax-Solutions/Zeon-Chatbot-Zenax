@@ -335,6 +335,7 @@ new class extends Component
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
             <form wire:submit="send()" class="flex items-center w-full space-x-2">
+                @csrf
                 <input wire:model="message" type="text" name="message" id="message"
                     wire:keydown.enter="send()"
                     class="flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] text-[#030712] focus-visible:ring-offset-2"
