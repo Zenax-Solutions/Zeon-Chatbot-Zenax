@@ -72,4 +72,10 @@ class ChatSessionResource extends Resource
             'edit' => Pages\EditChatSession::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('user_id', auth()->user()?->id);
+    }
 }
