@@ -103,14 +103,27 @@ class WhatsAppWebhookController extends Controller
             return response()->json(['status' => 'chatbot not found'], 200);
         }
 
-        // 3. Call the chatbot API internally (no user token, as guest)
-        $response = Http::acceptJson()
-            ->post(url('/api/chatbot/respond'), [
-                'message' => $text,
-                'chatbot_id' => $chatbot->id,
-            ]);
+        // 3. Call the chatbot API internally (impersonate user)
+        // Find the owner of the chatbot and create a token for internal API call
+        $owner = null;
+        if ($chatbot && $chatbot->user_id) {
+            $owner = \App\Models\User::find($chatbot->user_id);
+        }
+        $token = null;
+        if ($owner) {
+            $token = $owner->createToken('whatsapp')->plainTextToken;
+        }
 
-        $reply = $response->json('reply');
+        // 3. Call the chatbot API internally (as chatbot owner, if possible)
+        $http = Http::acceptJson();
+        if ($token) {
+            $http = $http->withToken($token);
+        }
+        $response = $http->post(url('/api/chatbot/respond'), [
+            'message' => $text,
+            'chatbot_id' => $chatbot->id,
+        ]);
+        $reply = $response->json('reply', 'Sorry, I could not process your request.');
 
         Log::info('WhatsApp Webhook: Chatbot reply generated', [
             'chatbot_id' => $chatbot->id,
