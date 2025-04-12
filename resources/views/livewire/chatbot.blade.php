@@ -64,6 +64,8 @@ new class extends Component
             })
             ->toArray();
 
+        $this->dispatch('scroll-chat');
+
         // If no messages, show welcome
         if (empty($this->messages)) {
             $welcome = '👋 Hello! I am Zeon, your AI assistant 🤖. How can I help you today? 😊 | 👋 හෙලෝ! මම Zeon, ඔබගේ AI උපකාරකයා 🤖. අද ඔබට මට උදව් කරන්න පුළුවන්ද? 😊';
@@ -79,8 +81,6 @@ new class extends Component
                 'sent_by' => 'bot',
             ]);
         }
-
-        $this->dispatch('scroll-chat');
     }
 
     public function send()
