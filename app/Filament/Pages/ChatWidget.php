@@ -37,7 +37,7 @@ class ChatWidget extends Page
         }
 
         $this->messages = $this->selectedSession
-            ? $this->selectedSession->messages()->orderBy('created_at')->get()
+            ? $this->selectedSession->messages()->orderBy('updated_at')->get()
             : collect();
     }
 
