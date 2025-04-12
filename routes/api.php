@@ -11,7 +11,9 @@ Route::get('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController
 
 Route::post('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'handle']);
 
-Route::post('/chatbot/respond', [\App\Http\Controllers\ChatBotApiController::class, 'respond']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/chatbot/respond', [\App\Http\Controllers\ChatBotApiController::class, 'respond']);
+});
 
 
 Route::post('/login', function (Request $request) {
