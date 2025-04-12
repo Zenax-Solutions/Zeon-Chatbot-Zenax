@@ -132,30 +132,49 @@ class WhatsAppWebhookController extends Controller
             return response()->json(['status' => 'WhatsApp API credentials missing for this chatbot'], 500);
         }
 
-        // Detect if reply is an image URL
-        $isImage = false;
-        if (is_string($reply) && preg_match('/\.(jpg|jpeg|png|gif)$/i', $reply) && filter_var($reply, FILTER_VALIDATE_URL)) {
-            $isImage = true;
+        // Improved: Extract image URLs from reply and send as image, send text separately if needed
+        $imageUrl = null;
+        $textBody = $reply;
+
+        if (is_string($reply)) {
+            // Extract all URLs
+            preg_match_all('/https?:\/\/[^\s]+/i', $reply, $matches);
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $url) {
+                    if (preg_match('/\.(jpg|jpeg|png|gif)$/i', $url)) {
+                        $imageUrl = $url;
+                        // Remove image URL from text body
+                        $textBody = trim(str_replace($url, '', $reply));
+                        break;
+                    }
+                }
+            }
         }
 
-        if ($isImage) {
+        $sendResponse = null;
+        // Send image if found
+        if ($imageUrl) {
             $payload = [
                 'messaging_product' => 'whatsapp',
                 'to' => $from,
                 'type' => 'image',
-                'image' => ['link' => $reply],
+                'image' => ['link' => $imageUrl],
             ];
-        } else {
+            $sendResponse = Http::withToken($whatsappAccessToken)
+                ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
+        }
+
+        // Send text if present (and not just the image URL)
+        if (!empty($textBody)) {
             $payload = [
                 'messaging_product' => 'whatsapp',
                 'to' => $from,
                 'type' => 'text',
-                'text' => ['body' => $reply],
+                'text' => ['body' => $textBody],
             ];
+            $sendResponse = Http::withToken($whatsappAccessToken)
+                ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
         }
-
-        $sendResponse = Http::withToken($whatsappAccessToken)
-            ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
 
         Log::info('WhatsApp Webhook: Sent reply to WhatsApp user', [
             'to' => $from,
