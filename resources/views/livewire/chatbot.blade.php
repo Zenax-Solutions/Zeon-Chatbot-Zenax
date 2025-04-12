@@ -79,6 +79,8 @@ new class extends Component
                 'sent_by' => 'bot',
             ]);
         }
+
+        $this->dispatch('scroll-chat');
     }
 
     public function send()
