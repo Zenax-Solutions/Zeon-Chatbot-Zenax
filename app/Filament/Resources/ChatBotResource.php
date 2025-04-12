@@ -81,22 +81,29 @@ class ChatBotResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('whatsapp_token')
                                     ->label('WhatsApp API Token')
+                                    ->placeholder('WhatsApp API Token')
+                                    ->helperText('This is the token used to authenticate requests to the WhatsApp Business API.')
                                     ->password(),
                                 Forms\Components\TextInput::make('whatsapp_phone_number_id')
+                                    ->placeholder('WhatsApp phone number ID')
+                                    ->helperText('This is the ID of the WhatsApp phone number associated with your WhatsApp Business API account.')
                                     ->label('Phone Number ID'),
                                 Forms\Components\TextInput::make('whatsapp_verify_token')
+                                    ->placeholder('WhatsApp verify token, used to verify the webhook | Ex : my_secret_token')
+                                    ->helperText('This token is used to verify the webhook URL with WhatsApp. It should be a random string.')
                                     ->label('Verify Token'),
                                 Forms\Components\TextInput::make('webhook_url')
+                                    ->url()
+                                    ->readOnly()
+                                    ->placeholder('Webhook URL will be generated automatically')
+                                    ->helperText('This URL is used to receive incoming messages and notifications from WhatsApp.')
                                     ->label('Webhook URL'),
-                                Forms\Components\TextInput::make('status')
-                                    ->label('Status'),
                             ])->relationship(
                                 'whatsappIntegration',
                                 'whatsapp_token',
                                 'whatsapp_phone_number_id',
                                 'whatsapp_verify_token',
                                 'webhook_url',
-                                'status'
                             ),
                     ]),
             ]);
