@@ -1,30 +1,3 @@
-<script>
-    // Session expires after 1 hour (3600 seconds)
-    const SESSION_EXPIRY_SECONDS = 3600;
-
-    function generateSessionId() {
-        return 'sess-' + Math.random().toString(36).substr(2, 16) + '-' + Date.now();
-    }
-
-    function setNewSession() {
-        const newId = generateSessionId();
-        localStorage.setItem('chat_session_id', newId);
-        localStorage.setItem('chat_session_created_at', Date.now().toString());
-        return newId;
-    }
-    let sessionId = localStorage.getItem('chat_session_id');
-    let createdAt = parseInt(localStorage.getItem('chat_session_created_at') || '0', 10);
-    let now = Date.now();
-    if (!sessionId || !createdAt || ((now - createdAt) / 1000) > SESSION_EXPIRY_SECONDS) {
-        sessionId = setNewSession();
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        let input = document.getElementById('chat-session-id');
-        if (input) input.value = sessionId;
-    });
-</script>
-<input type="hidden" id="chat-session-id" name="chat_session_id" value="">
-
 <?php
 
 use App\Models\BusinessData;
@@ -61,20 +34,18 @@ new class extends Component
         $sessionLookup = [
             'chat_bot_id' => $chatbot->id,
         ];
-        // If user is authenticated, use user_id for isolation; else use browser_session_id
-        if ($user && $user->id) {
-            $sessionLookup['user_id'] = $user->id;
-        } else {
-            $sessionLookup['browser_session_id'] = $browserSessionId;
+        // Use Laravel session for chat session isolation
+        $chatSessionId = session('chat_session_id');
+        if ($chatSessionId) {
+            $session = ChatSession::find($chatSessionId);
         }
-        $session = ChatSession::firstOrCreate(
-            $sessionLookup,
-            [
-                'browser_session_id' => $browserSessionId,
-                'user_id' => $user ? $user->id : null,
+        if (empty($session)) {
+            $session = ChatSession::create([
+                'chat_bot_id' => $chatbot->id,
                 'title' => 'Chat with Zeon',
-            ]
-        );
+            ]);
+            session(['chat_session_id' => $session->id]);
+        }
         $this->sessionId = $session->id;
 
         // Load previous messages from the database
@@ -411,7 +382,7 @@ new class extends Component
             {{-- Scroll to bottom marker --}}
             <div id="bottom-marker" class="h-0"></div>
         </div>
-        <input type="hidden" id="chat-session-id" name="chat_session_id" value="">
+
 
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
@@ -462,13 +433,32 @@ new class extends Component
         });
     </script>
 
+
+
     <script>
-        if (!sessionStorage.getItem('chat_session_id')) {
-            sessionStorage.setItem('chat_session_id', 'sess-' + Math.random().toString(36).substr(2, 16) + '-' + Date.now());
+        // Session expires after 1 hour (3600 seconds)
+        const SESSION_EXPIRY_SECONDS = 3600;
+
+        function generateSessionId() {
+            return 'sess-' + Math.random().toString(36).substr(2, 16) + '-' + Date.now();
+        }
+
+        function setNewSession() {
+            const newId = generateSessionId();
+            localStorage.setItem('chat_session_id', newId);
+            localStorage.setItem('chat_session_created_at', Date.now().toString());
+            return newId;
+        }
+        let sessionId = localStorage.getItem('chat_session_id');
+        let createdAt = parseInt(localStorage.getItem('chat_session_created_at') || '0', 10);
+        let now = Date.now();
+        if (!sessionId || !createdAt || ((now - createdAt) / 1000) > SESSION_EXPIRY_SECONDS) {
+            sessionId = setNewSession();
         }
         document.addEventListener('DOMContentLoaded', function() {
             let input = document.getElementById('chat-session-id');
-            if (input) input.value = sessionStorage.getItem('chat_session_id');
+            if (input) input.value = sessionId;
         });
     </script>
+
 </div>
