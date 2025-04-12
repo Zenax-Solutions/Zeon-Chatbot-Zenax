@@ -25,7 +25,6 @@
                     The page you are looking for doesn't exist or has been moved.<br>
                     But don't worry, you can always go back to the homepage!
                 </p>
-                <a href="/" class="inline-block px-6 py-2 bg-purple-500 text-white rounded-full shadow hover:bg-purple-600 transition">Go Home</a>
             </div>
         </div>
     </div>
