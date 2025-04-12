@@ -56,9 +56,6 @@ Route::get('/embed/chatbot', function (Request $request) {
         abort(404);
     }
 
-
-
-
     // Pass chatbot data to the view (replace 'welcome' with your chatbot view)
     return view('welcome', [
         'chatbot' => $chatbot ?? null,
