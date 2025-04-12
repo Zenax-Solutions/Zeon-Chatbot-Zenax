@@ -9,8 +9,9 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'verify']);
 
+Route::post('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'handle']);
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'handle']);
     Route::post('/chatbot/respond', [\App\Http\Controllers\ChatBotApiController::class, 'respond']);
 });
 
