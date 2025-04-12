@@ -110,7 +110,7 @@ class WhatsAppWebhookController extends Controller
                 'chatbot_id' => $chatbot->id,
             ]);
 
-        $reply = $response->json('reply', 'Sorry, I could not process your request.');
+        $reply = $response->json('reply');
 
         Log::info('WhatsApp Webhook: Chatbot reply generated', [
             'chatbot_id' => $chatbot->id,
