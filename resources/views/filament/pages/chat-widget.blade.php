@@ -82,22 +82,6 @@
                 {{-- Scroll to bottom marker --}}
                 <div id="bottom-marker" class="h-0"></div>
             </div>
-            <!-- Chat Input -->
-            @if ($selectedSession)
-            <form method="POST" action="#" class="flex items-center border-t p-3 bg-gray-50">
-                @csrf
-                <input
-                    type="text"
-                    name="message"
-                    class="flex-1 border rounded px-3 py-2 mr-2 focus:outline-none"
-                    placeholder="Type your message..."
-                    autocomplete="off"
-                    required>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    Send
-                </button>
-            </form>
-            @endif
         </div>
     </div>
 </x-filament-panels::page>
