@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\ChatBot;
+use App\Models\WhatsAppIntegration;
 use Illuminate\Support\Facades\DB;
 
 class WhatsAppWebhookController extends Controller
@@ -17,9 +18,19 @@ class WhatsAppWebhookController extends Controller
         $mode = $request->input('hub_mode');
         $token = $request->input('hub_verify_token');
         $challenge = $request->input('hub_challenge');
+        $chatBotId = $request->input('chat_bot_id');
 
-        // Set this to a secure value and also in your WhatsApp webhook config
-        $verifyToken = config('services.whatsapp.verify_token', 'my_custom_verify_token');
+        if (!$chatBotId) {
+            return response('chat_bot_id is required', 400);
+        }
+
+        $integration = WhatsAppIntegration::where('chat_bot_id', $chatBotId)->first();
+
+        if (!$integration || !$integration->whatsapp_verify_token) {
+            return response('Integration not found', 404);
+        }
+
+        $verifyToken = $integration->whatsapp_verify_token;
 
         if ($mode === 'subscribe' && $token === $verifyToken) {
             return response($challenge, 200);
