@@ -68,14 +68,22 @@ class ChatSessionResource extends Resource
     {
         return [
             'index' => Pages\ListChatSessions::route('/'),
-            'create' => Pages\CreateChatSession::route('/create'),
             'edit' => Pages\EditChatSession::route('/{record}/edit'),
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->where('user_id', auth()->user()?->id);
+        $query = parent::getEloquentQuery();
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user) {
+            return $query->where('user_id', $user->id)->orWhereNull('user_id');
+        }
+        return $query;
     }
 }
