@@ -94,7 +94,7 @@ class WhatsAppWebhookController extends Controller
         }
 
         // Fetch WhatsApp integration for this chatbot
-        $integration = \DB::table('whatsapp_integrations')->where('chat_bot_id', $chatbot->id)->first();
+        $integration = DB::table('whatsapp_integrations')->where('chat_bot_id', $chatbot->id)->first();
         if (!$integration) {
             Log::warning('WhatsApp Webhook: WhatsApp integration not found for chatbot', [
                 'chat_bot_id' => $chatbot->id,
