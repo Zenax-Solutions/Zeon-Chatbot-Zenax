@@ -27,7 +27,7 @@ return [
 
     'exposed_headers' => [],
 
-    'paths' => ['api/*', 'embed/*'],
+    'paths' => ['api/*', 'embed/*', 'livewire/*'],
 
     'max_age' => 0,
 
