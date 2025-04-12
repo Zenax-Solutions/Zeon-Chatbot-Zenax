@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\BusinessData;
+use App\Models\ChatSession;
+use App\Models\ChatMessage;
 use Illuminate\Support\Arr;
 use Livewire\Volt\Component;
 use MoeMizrak\LaravelOpenrouter\DTO\ChatData;
@@ -19,6 +21,7 @@ new class extends Component
     public $website = null;
 
     public $placeholder = false;
+    public $sessionId = null;
 
     public function mount($chatbot, $user, $website)
     {
@@ -26,12 +29,44 @@ new class extends Component
         $this->user = $user;
         $this->website = $website;
 
-        $this->messages = [
-            [
+        // Use browser session ID for isolation
+        $browserSessionId = request()->input('chat_session_id');
+        $session = ChatSession::firstOrCreate([
+            'browser_session_id' => $browserSessionId,
+            'chat_bot_id' => $chatbot->id,
+        ], [
+            'user_id' => $user ? $user->id : null,
+            'title' => 'Chat with Zeon',
+        ]);
+        $this->sessionId = $session->id;
+
+        // Load previous messages from the database
+        $this->messages = ChatMessage::where('chat_session_id', $session->id)
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($msg) {
+                return [
+                    'type' => $msg->sent_by === 'user' ? 'sent' : 'received',
+                    'content' => $msg->message,
+                ];
+            })
+            ->toArray();
+
+        // If no messages, show welcome
+        if (empty($this->messages)) {
+            $welcome = '👋 Hello! I am Zeon, your AI assistant 🤖. How can I help you today? 😊 | 👋 හෙලෝ! මම Zeon, ඔබගේ AI උපකාරකයා 🤖. අද ඔබට මට උදව් කරන්න පුළුවන්ද? 😊';
+            $this->messages[] = [
                 'type' => 'received',
-                'content' => '👋 Hello! I am Zeon, your AI assistant 🤖. How can I help you today? 😊 | 👋 හෙලෝ! මම Zeon, ඔබගේ AI උපකාරකයා 🤖. අද ඔබට මට උදව් කරන්න පුළුවන්ද? 😊',
-            ],
-        ];
+                'content' => $welcome,
+            ];
+            // Save welcome message to DB (as bot)
+            ChatMessage::create([
+                'chat_session_id' => $session->id,
+                'user_id' => null,
+                'message' => $welcome,
+                'sent_by' => 'bot',
+            ]);
+        }
     }
 
     public function send()
@@ -39,9 +74,17 @@ new class extends Component
         $content = trim($this->message);
         if ($content === '') return;
 
+        // Save user message to DB
+        ChatMessage::create([
+            'chat_session_id' => $this->sessionId,
+            'user_id' => $this->user->id,
+            'message' => $content,
+            'sent_by' => 'user',
+        ]);
+
         $this->messages[] = [
             'type' => 'sent',
-            'content' => $this->message,
+            'content' => $content,
         ];
 
         $this->message = '';
@@ -152,6 +195,14 @@ new class extends Component
         } catch (\Exception $e) {
             $reply = '⚠️ Zeon is temporarily unavailable. Please try again later.';
         }
+
+        // Save bot reply to DB
+        ChatMessage::create([
+            'chat_session_id' => $this->sessionId,
+            'user_id' => null,
+            'message' => $reply,
+            'sent_by' => 'bot',
+        ]);
 
         $this->messages[] = [
             'type' => 'received',
@@ -323,7 +374,7 @@ new class extends Component
             {{-- Scroll to bottom marker --}}
             <div id="bottom-marker" class="h-0"></div>
         </div>
-
+        <input type="hidden" id="chat-session-id" name="chat_session_id" value="">
 
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
@@ -371,6 +422,16 @@ new class extends Component
         window.addEventListener('recived-sound', () => {
             const audio = new Audio('/sounds/recived.mp3');
             audio.play().catch(e => console.error("Audio play failed:", e));
+        });
+    </script>
+
+    <script>
+        if (!sessionStorage.getItem('chat_session_id')) {
+            sessionStorage.setItem('chat_session_id', 'sess-' + Math.random().toString(36).substr(2, 16) + '-' + Date.now());
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            let input = document.getElementById('chat-session-id');
+            if (input) input.value = sessionStorage.getItem('chat_session_id');
         });
     </script>
 </div>
