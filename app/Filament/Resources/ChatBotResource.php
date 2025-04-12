@@ -91,6 +91,7 @@ class ChatBotResource extends Resource
                                 Forms\Components\TextInput::make('whatsapp_verify_token')
                                     ->placeholder('WhatsApp verify token, used to verify the webhook | Ex : my_secret_token')
                                     ->helperText('This token is used to verify the webhook URL with WhatsApp. It should be a random string.')
+                                    ->unique(ignoreRecord: true)
                                     ->label('Verify Token'),
                                 Forms\Components\TextInput::make('webhook_url')
                                     ->url()
