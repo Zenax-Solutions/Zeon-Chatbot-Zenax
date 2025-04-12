@@ -1,0 +1,17 @@
+.fi-sidebar-item-icon {
+    color: rgb(32 165 237) !important;
+}
+
+.fi-sidebar {
+    background: #000000 !important;
+}
+
+.text-gray-500 {
+    --tw-text-opacity: 1;
+    color: rgb(83 165 247) !important;
+}
+
+.text-gray-700 {
+    --tw-text-opacity: 1;
+    color: rgb(170, 160, 160) !important;
+}
