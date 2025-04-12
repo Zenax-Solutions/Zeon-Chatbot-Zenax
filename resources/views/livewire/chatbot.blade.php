@@ -45,7 +45,7 @@ new class extends Component
                 'guest_ip' => $guestIp,
             ],
             [
-                'title' => 'Chat with Zeon',
+                'title' => 'Chat with ' . $chatbot->website_name,
             ]
         );
         $this->sessionId = $session->id;

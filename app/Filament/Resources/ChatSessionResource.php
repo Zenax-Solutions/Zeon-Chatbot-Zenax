@@ -32,10 +32,11 @@ class ChatSessionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('browser_session_id')->label('Browser Session')->searchable()->limit(16),
-                Tables\Columns\TextColumn::make('user_id')->label('User ID')->sortable(),
-                Tables\Columns\TextColumn::make('chat_bot_id')->label('ChatBot ID')->sortable(),
+                Tables\Columns\TextColumn::make('user.name')->label('User')->sortable(),
+                Tables\Columns\TextColumn::make('chatBot.website_name')->label('ChatBot')->sortable(),
                 Tables\Columns\TextColumn::make('title')->limit(30),
+                Tables\Columns\TextColumn::make('guest_ip')->label('Guest IP')->limit(30),
+                Tables\Columns\TextColumn::make('messages_count')->counts('messages')->label('Messages'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([
