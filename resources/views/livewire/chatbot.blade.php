@@ -70,13 +70,6 @@ new class extends Component
                 'type' => 'received',
                 'content' => $welcome,
             ];
-            // Save welcome message to DB (as bot)
-            ChatMessage::create([
-                'chat_session_id' => $session->id,
-                'user_id' => null,
-                'message' => $welcome,
-                'sent_by' => 'bot',
-            ]);
         }
     }
 
@@ -439,24 +432,24 @@ new class extends Component
         function watchUserScroll() {
             let timeout;
 
-            const container = document.querySelector('body'); // You can target a specific chat container here
+            const container = document.getElementById('chat-container'); // You can target a specific chat container here
 
             container.addEventListener('mousedown', () => userInteracting = true);
             container.addEventListener('touchstart', () => userInteracting = true);
             container.addEventListener('wheel', () => {
                 userInteracting = true;
                 clearTimeout(timeout);
-                timeout = setTimeout(() => userInteracting = false, 2000); // reset after user stops for 2s
+                timeout = setTimeout(() => userInteracting = false, 5000); // reset after user stops for 2s
             });
 
             container.addEventListener('mouseup', () => {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => userInteracting = false, 2000);
+                timeout = setTimeout(() => userInteracting = false, 5000);
             });
 
             container.addEventListener('touchend', () => {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => userInteracting = false, 2000);
+                timeout = setTimeout(() => userInteracting = false, 5000);
             });
         }
 
