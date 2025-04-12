@@ -27,7 +27,7 @@ class ChatWidget extends Page
     public function mount()
     {
         $user = Auth::user();
-        $this->sessions = ChatSession::where('user_id', $user->id)->latest()->get();
+        $this->sessions = ChatSession::where('user_id', $user->id)->orderBy('updated_at')->get();
 
         $sessionId = request()->query('session');
         if ($sessionId) {
@@ -37,7 +37,7 @@ class ChatWidget extends Page
         }
 
         $this->messages = $this->selectedSession
-            ? $this->selectedSession->messages()->orderBy('updated_at')->get()
+            ? $this->selectedSession->messages()->orderBy('created_at')->get()
             : collect();
     }
 
