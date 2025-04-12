@@ -20,7 +20,7 @@
                     <path d="M16 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" />
                     <rect x="21" y="28" width="6" height="6" rx="3" fill="#a78bfa" />
                 </svg>
-                <h1 class="text-3xl font-bold text-purple-700 mb-2">Oops! Chatbot Inactive</h1>
+                <h1 class="text-3xl font-bold text-cyan-700 mb-2">Oops! Chatbot Inactive</h1>
                 <p class="text-gray-600 mb-6">
                     The chatbot you're trying to access is currently inactive or the credentials provided are invalid.<br>
                     Please check your configuration or contact the site administrator for assistance.
