@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\ChatBot;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,11 @@ class WhatsAppWebhookController extends Controller
 
     public function handle(Request $request)
     {
+        // Log the full incoming request payload for debugging/auditing
+        Log::info('WhatsApp Webhook Received', [
+            'payload' => $request->all(),
+        ]);
+
         // 1. Extract WhatsApp message and sender
         $entry = $request->input('entry', [])[0] ?? [];
         $changes = $entry['changes'][0] ?? [];
@@ -36,6 +42,11 @@ class WhatsAppWebhookController extends Controller
         $messages = $value['messages'][0] ?? null;
 
         if (!$messages) {
+            Log::warning('WhatsApp Webhook: No message found in payload', [
+                'entry' => $entry,
+                'changes' => $changes,
+                'value' => $value,
+            ]);
             return response()->json(['status' => 'no message'], 200);
         }
 
@@ -43,6 +54,11 @@ class WhatsAppWebhookController extends Controller
         $text = $messages['text']['body'] ?? null;
 
         if (!$from || !$text) {
+            Log::warning('WhatsApp Webhook: Invalid message structure', [
+                'messages' => $messages,
+                'from' => $from,
+                'text' => $text,
+            ]);
             return response()->json(['status' => 'invalid message'], 200);
         }
 
@@ -51,18 +67,27 @@ class WhatsAppWebhookController extends Controller
         // For demo: find user by phone number (assuming phone is stored in E.164 format)
         $user = User::where('phone', $from)->first();
         if (!$user) {
+            Log::warning('WhatsApp Webhook: User not found for phone', [
+                'from' => $from,
+            ]);
             // Optionally, create a new user or ignore
             return response()->json(['status' => 'user not found'], 200);
         }
 
         $chatbot = ChatBot::where('user_id', $user->id)->first();
         if (!$chatbot) {
+            Log::warning('WhatsApp Webhook: Chatbot not found for user', [
+                'user_id' => $user->id,
+            ]);
             return response()->json(['status' => 'chatbot not found'], 200);
         }
 
         // Fetch WhatsApp integration for this chatbot
         $integration = \DB::table('whatsapp_integrations')->where('chat_bot_id', $chatbot->id)->first();
         if (!$integration) {
+            Log::warning('WhatsApp Webhook: WhatsApp integration not found for chatbot', [
+                'chat_bot_id' => $chatbot->id,
+            ]);
             return response()->json(['status' => 'whatsapp integration not found for chatbot'], 200);
         }
 
@@ -78,11 +103,21 @@ class WhatsAppWebhookController extends Controller
 
         $reply = $response->json('reply', 'Sorry, I could not process your request.');
 
+        Log::info('WhatsApp Webhook: Chatbot reply generated', [
+            'user_id' => $user->id,
+            'chatbot_id' => $chatbot->id,
+            'incoming_message' => $text,
+            'reply' => $reply,
+        ]);
+
         // 4. Send reply back to WhatsApp user
         $whatsappAccessToken = $integration->whatsapp_token;
         $phoneNumberId = $integration->whatsapp_phone_number_id;
 
         if (!$whatsappAccessToken || !$phoneNumberId) {
+            Log::error('WhatsApp Webhook: WhatsApp API credentials missing for chatbot', [
+                'chat_bot_id' => $chatbot->id,
+            ]);
             return response()->json(['status' => 'WhatsApp API credentials missing for this chatbot'], 500);
         }
 
@@ -93,6 +128,12 @@ class WhatsAppWebhookController extends Controller
                 'type' => 'text',
                 'text' => ['body' => $reply],
             ]);
+
+        Log::info('WhatsApp Webhook: Sent reply to WhatsApp user', [
+            'to' => $from,
+            'reply' => $reply,
+            'whatsapp_response' => $sendResponse->json(),
+        ]);
 
         return response()->json(['status' => 'sent', 'whatsapp_response' => $sendResponse->json()], 200);
     }
