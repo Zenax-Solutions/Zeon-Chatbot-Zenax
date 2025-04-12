@@ -36,10 +36,12 @@ class ChatBotResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('website_name')
                                     ->label('Website Name')
+                                    ->unique(ignoreRecord: true)
                                     ->required(),
 
                                 Forms\Components\TextInput::make('website_url')
                                     ->label('Website URL')
+                                    ->unique(ignoreRecord: true)
                                     ->required()
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn(Set $set, ?string $state) => $set('widget_code', '<script src="' . env('APP_URL') . '/chatbot.js?website=' . $state . '&user=' . auth()->user()?->uuid . '"></script>')),

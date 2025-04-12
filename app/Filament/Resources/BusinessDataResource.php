@@ -33,8 +33,10 @@ class BusinessDataResource extends Resource
                             ->label('Business Content')
                             ->rows(6)
                             ->placeholder('Enter business description, details, or notes...')
+                            ->helperText('This information will be used to provide context to the chatbot.')
                             ->required(),
-                    ])
+                    ])->visible(fn() => \App\Models\ChatBot::where('user_id', auth()->user()?->id)->exists())
+
                     ->columns(1),
 
                 Forms\Components\Section::make('Assign to ChatBots')
@@ -42,6 +44,7 @@ class BusinessDataResource extends Resource
                     ->schema([
                         Forms\Components\MultiSelect::make('chatBots')
                             ->label('Select ChatBots')
+                            ->relationship('chatBots', 'website_name')
                             ->options(fn() => \App\Models\ChatBot::where('user_id', auth()->user()?->id)->pluck('website_name', 'id'))
                             ->placeholder('Choose chatbots...')
                             ->required()
@@ -56,13 +59,11 @@ class BusinessDataResource extends Resource
                                 \Filament\Forms\Components\Actions\Action::make('createChatBot')
                                     ->label('Add a ChatBot')
                                     ->url('/admin/chat-bots/create')
-                                    ->openUrlInNewTab()
                                     ->button()
                                     ->color('primary')
                             ),
                     ])
                     ->columns(1)
-                    ->visible(fn($livewire) => $livewire->record === null),
             ]);
     }
 
