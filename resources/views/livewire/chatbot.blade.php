@@ -29,8 +29,6 @@ new class extends Component
         $this->user = $user;
         $this->website = $website;
 
-        $this->dispatch('scroll-chat');
-
         // Use Laravel session for chat session isolation
         $chatSessionId = session('chat_session_id');
         if ($chatSessionId) {
@@ -418,6 +416,23 @@ new class extends Component
                 });
             }, 100);
         });
+
+        function scrollChatInterval() {
+            setInterval(() => {
+                let msgInput = document.getElementById('message');
+                if (msgInput) msgInput.value = '';
+
+                const bottomMarker = document.getElementById('bottom-marker');
+                if (bottomMarker) {
+                    bottomMarker.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            }, 1000); // runs every 1000ms = 1 second
+        }
+
+        // Call the function to start it
+        scrollChatInterval();
 
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form[wire\\:submit]');
