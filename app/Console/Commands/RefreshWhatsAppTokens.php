@@ -58,6 +58,7 @@ class RefreshWhatsAppTokens extends Command
                 $chatbot = \App\Models\ChatBot::find($integration->chat_bot_id);
                 if ($chatbot && $chatbot->user_id) {
                     $owner = \App\Models\User::find($chatbot->user_id);
+                    dd($owner);
                     if ($owner) {
                         $owner->notify(new \App\Notifications\WhatsAppTokenRefreshFailed($integration->id, $response->body()));
                     }

@@ -42,10 +42,25 @@ class ChatBotResource extends Resource
                                 Forms\Components\TextInput::make('website_url')
                                     ->label('Website URL')
                                     ->unique(ignoreRecord: true)
+                                    ->url()
                                     ->required()
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('widget_code', '<script src="' . env('APP_URL') . '/chatbot.js?website=' . $state . '&user=' . auth()->user()?->uuid . '"></script>')),
+                                    ->formatStateUsing(function (?string $state) {
+                                        if (!$state) return null;
 
+                                        $state = rtrim($state, '/');                        // remove trailing slash
+
+                                        return $state;
+                                    })
+                                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                                        if (!$state) return;
+
+                                        $cleanUrl = rtrim($state, '/');
+
+                                        $set('website_url', $cleanUrl); // update the input with cleaned URL
+
+                                        $set('widget_code', '<script src="' . env('APP_URL') . '/chatbot.js?website=' . $cleanUrl . '&user=' . auth()->user()?->uuid . '"></script>');
+                                    }),
                                 Forms\Components\Textarea::make('widget_code')
                                     ->label('Chat Widget Code')
                                     ->rows(5)
