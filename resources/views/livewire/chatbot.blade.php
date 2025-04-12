@@ -1,3 +1,30 @@
+<script>
+    // Session expires after 1 hour (3600 seconds)
+    const SESSION_EXPIRY_SECONDS = 3600;
+
+    function generateSessionId() {
+        return 'sess-' + Math.random().toString(36).substr(2, 16) + '-' + Date.now();
+    }
+
+    function setNewSession() {
+        const newId = generateSessionId();
+        localStorage.setItem('chat_session_id', newId);
+        localStorage.setItem('chat_session_created_at', Date.now().toString());
+        return newId;
+    }
+    let sessionId = localStorage.getItem('chat_session_id');
+    let createdAt = parseInt(localStorage.getItem('chat_session_created_at') || '0', 10);
+    let now = Date.now();
+    if (!sessionId || !createdAt || ((now - createdAt) / 1000) > SESSION_EXPIRY_SECONDS) {
+        sessionId = setNewSession();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        let input = document.getElementById('chat-session-id');
+        if (input) input.value = sessionId;
+    });
+</script>
+<input type="hidden" id="chat-session-id" name="chat_session_id" value="">
+
 <?php
 
 use App\Models\BusinessData;
@@ -31,13 +58,23 @@ new class extends Component
 
         // Use browser session ID for isolation
         $browserSessionId = request()->input('chat_session_id');
-        $session = ChatSession::firstOrCreate([
-            'browser_session_id' => $browserSessionId,
+        $sessionLookup = [
             'chat_bot_id' => $chatbot->id,
-        ], [
-            'user_id' => $user ? $user->id : null,
-            'title' => 'Chat with Zeon',
-        ]);
+        ];
+        // If user is authenticated, use user_id for isolation; else use browser_session_id
+        if ($user && $user->id) {
+            $sessionLookup['user_id'] = $user->id;
+        } else {
+            $sessionLookup['browser_session_id'] = $browserSessionId;
+        }
+        $session = ChatSession::firstOrCreate(
+            $sessionLookup,
+            [
+                'browser_session_id' => $browserSessionId,
+                'user_id' => $user ? $user->id : null,
+                'title' => 'Chat with Zeon',
+            ]
+        );
         $this->sessionId = $session->id;
 
         // Load previous messages from the database

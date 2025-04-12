@@ -42,6 +42,8 @@ Route::get('/embed/chatbot', function (Request $request) {
         abort(404);
     }
 
+
+
     // Find chatbot by ID belonging to this user and matching website
     $chatbot = ChatBot::where('id', $chatbot_id)
         ->where('user_id', $userModel->id)
@@ -53,6 +55,8 @@ Route::get('/embed/chatbot', function (Request $request) {
     if (!$chatbot) {
         abort(404);
     }
+
+
 
 
     // Pass chatbot data to the view (replace 'welcome' with your chatbot view)
