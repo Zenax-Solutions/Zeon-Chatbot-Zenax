@@ -20,18 +20,23 @@ class ChatBotApiController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
-        }
-
-        // Only allow access to chatbots owned by the authenticated user
-        $chatbot = ChatBot::where('id', $request->input('chatbot_id'))
-            ->where('user_id', $user->id)
-            ->with('businessData')
-            ->first();
-
-        if (!$chatbot) {
-            return response()->json(['error' => 'Chatbot not found or not owned by user.'], 404);
+        if ($user) {
+            // Only allow access to chatbots owned by the authenticated user
+            $chatbot = ChatBot::where('id', $request->input('chatbot_id'))
+                ->where('user_id', $user->id)
+                ->with('businessData')
+                ->first();
+            if (!$chatbot) {
+                return response()->json(['error' => 'Chatbot not found or not owned by user.'], 404);
+            }
+        } else {
+            // Allow guest (webhook/internal) access by chat_bot_id only
+            $chatbot = ChatBot::where('id', $request->input('chatbot_id'))
+                ->with('businessData')
+                ->first();
+            if (!$chatbot) {
+                return response()->json(['error' => 'Chatbot not found.'], 404);
+            }
         }
 
         $userMessage = strip_tags($request->input('message'));
