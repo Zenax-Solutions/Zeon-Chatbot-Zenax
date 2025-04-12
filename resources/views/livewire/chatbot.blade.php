@@ -431,7 +431,7 @@ new class extends Component
                     document.getElementById('bottom-marker')?.scrollIntoView({
                         behavior: 'smooth'
                     });
-                }, 50); // Delay to allow Livewire to read the value before clearing
+                }, 10); // Delay to allow Livewire to read the value before clearing
             });
         });
 
