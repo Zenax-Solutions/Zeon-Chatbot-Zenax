@@ -74,39 +74,55 @@ class WhatsAppWebhookController extends Controller
         }
 
         // 2. Map WhatsApp user to system user and chatbot
-        // TODO: Implement actual mapping logic
-        // For demo: find user by phone number (assuming phone is stored in E.164 format)
-        $user = User::where('phone', $from)->first();
-        if (!$user) {
-            Log::warning('WhatsApp Webhook: User not found for phone', [
-                'from' => $from,
-            ]);
-            // Optionally, create a new user or ignore
-            return response()->json(['status' => 'user not found'], 200);
-        }
+        // Allow any WhatsApp user to interact with the webhook (no user lookup required)
+        // $user = User::where('phone', $from)->first();
+        // If you want to associate messages with users in the future, implement logic here.
 
-        $chatbot = ChatBot::where('user_id', $user->id)->first();
+        // Find chatbot by chat_bot_id from integration
+        $chatbot = null;
+        // Fetch WhatsApp integration for this chatbot (move this up to use integration for chatbot lookup)
+        $integration = null;
+        if ($integration && isset($integration->chat_bot_id)) {
+            $chatbot = ChatBot::find($integration->chat_bot_id);
+        }
         if (!$chatbot) {
-            Log::warning('WhatsApp Webhook: Chatbot not found for user', [
-                'user_id' => $user->id,
+            Log::warning('WhatsApp Webhook: Chatbot not found for integration', [
+                'chat_bot_id' => $integration->chat_bot_id ?? null,
             ]);
             return response()->json(['status' => 'chatbot not found'], 200);
         }
 
-        // Fetch WhatsApp integration for this chatbot
-        $integration = DB::table('whatsapp_integrations')->where('chat_bot_id', $chatbot->id)->first();
+
+        // Try to get chat_bot_id from payload, or use a default if needed
+        $chatBotId = $request->input('chat_bot_id') ?? null;
+        if ($chatBotId) {
+            $integration = DB::table('whatsapp_integrations')->where('chat_bot_id', $chatBotId)->first();
+        } else {
+            // fallback: try to get the first integration (not recommended for production)
+            $integration = DB::table('whatsapp_integrations')->first();
+        }
         if (!$integration) {
-            Log::warning('WhatsApp Webhook: WhatsApp integration not found for chatbot', [
-                'chat_bot_id' => $chatbot->id,
+            Log::warning('WhatsApp Webhook: WhatsApp integration not found', []);
+            return response()->json(['status' => 'whatsapp integration not found'], 200);
+        }
+
+        // Find chatbot by chat_bot_id from integration
+        $chatbot = null;
+        if ($integration && isset($integration->chat_bot_id)) {
+            $chatbot = ChatBot::find($integration->chat_bot_id);
+        }
+        if (!$chatbot) {
+            Log::warning('WhatsApp Webhook: Chatbot not found for integration', [
+                'chat_bot_id' => $integration->chat_bot_id ?? null,
             ]);
-            return response()->json(['status' => 'whatsapp integration not found for chatbot'], 200);
+            return response()->json(['status' => 'chatbot not found'], 200);
         }
 
         // 3. Call the chatbot API internally (impersonate user)
-        $token = $user->createToken('whatsapp')->plainTextToken;
+        // No user token needed; call chatbot API as guest or with internal key
+        // $token = $user->createToken('whatsapp')->plainTextToken;
 
-        $response = Http::withToken($token)
-            ->acceptJson()
+        $response = Http::acceptJson()
             ->post(url('/api/chatbot/respond'), [
                 'message' => $text,
                 'chatbot_id' => $chatbot->id,
@@ -115,7 +131,6 @@ class WhatsAppWebhookController extends Controller
         $reply = $response->json('reply', 'Sorry, I could not process your request.');
 
         Log::info('WhatsApp Webhook: Chatbot reply generated', [
-            'user_id' => $user->id,
             'chatbot_id' => $chatbot->id,
             'incoming_message' => $text,
             'reply' => $reply,
