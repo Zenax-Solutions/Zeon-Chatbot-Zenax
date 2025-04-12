@@ -40,13 +40,6 @@ class ChatBotResource extends Resource
 
                                 Forms\Components\TextInput::make('website_url')
                                     ->label('Website URL')
-                                    ->rules([
-                                        'url',
-                                        function () {
-                                            return \Illuminate\Validation\Rule::unique('chat_bots', 'website_url')
-                                                ->where('user_id', auth()->id());
-                                        },
-                                    ])
                                     ->required()
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn(Set $set, ?string $state) => $set('widget_code', '<script src="' . env('APP_URL') . '/chatbot.js?website=' . $state . '&user=' . auth()->user()?->uuid . '"></script>')),
@@ -71,21 +64,23 @@ class ChatBotResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('whatsapp_token')
                                     ->label('WhatsApp API Token')
-                                    ->password()
-                                    ->dehydrateStateUsing(fn($state) => $state ?: null),
+                                    ->password(),
                                 Forms\Components\TextInput::make('whatsapp_phone_number_id')
-                                    ->label('Phone Number ID')
-                                    ->dehydrateStateUsing(fn($state) => $state ?: null),
+                                    ->label('Phone Number ID'),
                                 Forms\Components\TextInput::make('whatsapp_verify_token')
-                                    ->label('Verify Token')
-                                    ->dehydrateStateUsing(fn($state) => $state ?: null),
+                                    ->label('Verify Token'),
                                 Forms\Components\TextInput::make('webhook_url')
-                                    ->label('Webhook URL')
-                                    ->dehydrateStateUsing(fn($state) => $state ?: null),
+                                    ->label('Webhook URL'),
                                 Forms\Components\TextInput::make('status')
-                                    ->label('Status')
-                                    ->dehydrateStateUsing(fn($state) => $state ?: null),
-                            ]),
+                                    ->label('Status'),
+                            ])->relationship(
+                                'whatsappIntegration',
+                                'whatsapp_token',
+                                'whatsapp_phone_number_id',
+                                'whatsapp_verify_token',
+                                'webhook_url',
+                                'status'
+                            ),
                     ]),
             ]);
     }
