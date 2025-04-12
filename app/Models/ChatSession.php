@@ -9,6 +9,7 @@ class ChatSession extends Model
     protected $fillable = [
         'user_id',
         'chat_bot_id',
+        'guest_ip',
         'title',
     ];
 

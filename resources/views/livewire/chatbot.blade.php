@@ -29,23 +29,25 @@ new class extends Component
         $this->user = $user;
         $this->website = $website;
 
-        // Use browser session ID for isolation
-        $browserSessionId = request()->input('chat_session_id');
-        $sessionLookup = [
-            'chat_bot_id' => $chatbot->id,
-        ];
+
         // Use Laravel session for chat session isolation
         $chatSessionId = session('chat_session_id');
         if ($chatSessionId) {
             $session = ChatSession::find($chatSessionId);
         }
-        if (empty($session)) {
-            $session = ChatSession::create([
+        // Use guest IP for session isolation per chatbot
+        $guestIp = request()->ip();
+
+        $session = ChatSession::firstOrCreate(
+            [
+                'user_id' => $this->user ? $this->user->id : null,
                 'chat_bot_id' => $chatbot->id,
+                'guest_ip' => $guestIp,
+            ],
+            [
                 'title' => 'Chat with Zeon',
-            ]);
-            session(['chat_session_id' => $session->id]);
-        }
+            ]
+        );
         $this->sessionId = $session->id;
 
         // Load previous messages from the database
@@ -56,6 +58,8 @@ new class extends Component
                 return [
                     'type' => $msg->sent_by === 'user' ? 'sent' : 'received',
                     'content' => $msg->message,
+                    'sent_by' => $msg->sent_by,
+                    'created_at' => $msg->created_at,
                 ];
             })
             ->toArray();
@@ -80,12 +84,12 @@ new class extends Component
     public function send()
     {
         $content = trim($this->message);
-        if ($content === '') return;
+        if ($content === '' || !$this->sessionId) return;
 
         // Save user message to DB
         ChatMessage::create([
             'chat_session_id' => $this->sessionId,
-            'user_id' => $this->user->id,
+            'user_id' => $this->user && isset($this->user->id) ? $this->user->id : null,
             'message' => $content,
             'sent_by' => 'user',
         ]);
@@ -105,6 +109,8 @@ new class extends Component
     #[On('chat-response')]
     public function loadResponse(string $userMessage)
     {
+        if (!$this->sessionId) return;
+
         $userMessage = strip_tags($userMessage);
         $businessInfo = $this->retrieveRelevantInfo();
 
