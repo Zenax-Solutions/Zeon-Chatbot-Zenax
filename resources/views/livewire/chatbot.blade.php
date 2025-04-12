@@ -417,9 +417,13 @@ new class extends Component
             }, 100);
         });
 
-        function scrollChatInterval() {
+        let userInteracting = false;
+
+        function scrollChatLoop() {
             setInterval(() => {
-                let msgInput = document.getElementById('message');
+                if (userInteracting) return;
+
+                const msgInput = document.getElementById('message');
                 if (msgInput) msgInput.value = '';
 
                 const bottomMarker = document.getElementById('bottom-marker');
@@ -428,11 +432,37 @@ new class extends Component
                         behavior: 'smooth'
                     });
                 }
-            }, 1000); // runs every 1000ms = 1 second
+            }, 1000);
         }
 
-        // Call the function to start it
-        scrollChatInterval();
+        // Detect user scrollbar interaction
+        function watchUserScroll() {
+            let timeout;
+
+            const container = document.querySelector('body'); // You can target a specific chat container here
+
+            container.addEventListener('mousedown', () => userInteracting = true);
+            container.addEventListener('touchstart', () => userInteracting = true);
+            container.addEventListener('wheel', () => {
+                userInteracting = true;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => userInteracting = false, 2000); // reset after user stops for 2s
+            });
+
+            container.addEventListener('mouseup', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => userInteracting = false, 2000);
+            });
+
+            container.addEventListener('touchend', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => userInteracting = false, 2000);
+            });
+        }
+
+        // Start both
+        scrollChatLoop();
+        watchUserScroll();
 
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form[wire\\:submit]');
