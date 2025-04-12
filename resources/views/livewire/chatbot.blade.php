@@ -264,8 +264,14 @@ new class extends Component
         <div class="flex items-center gap-3 sticky top-0 bg-white z-10 p-4 border-b border-gray-200">
             <div class="flex flex-col space-y-1.5">
                 <h2 class="font-semibold text-lg tracking-tight">Chat Assistant ⚡</h2>
-                <p class="text-sm text-[#6b7280] leading-3">Powered by ZENAX</p>
+                <p class="text-sm text-[#6b7280] leading-3 flex items-center gap-2">
+                    Powered by ZENAX
+                    <span class="bg-amber-100 text-amber-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                        Beta v1.0
+                    </span>
+                </p>
             </div>
+
         </div>
 
         <!-- Scrollable Message Section -->
