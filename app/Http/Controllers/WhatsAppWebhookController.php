@@ -132,8 +132,8 @@ class WhatsAppWebhookController extends Controller
             return response()->json(['status' => 'WhatsApp API credentials missing for this chatbot'], 500);
         }
 
-        // Improved: Extract image URLs from reply and send as image, send text separately if needed
-        $imageUrl = null;
+        // Improved: Extract all image URLs and send each as an image message with the reply as caption
+        $imageUrls = [];
         $textBody = $reply;
 
         if (is_string($reply)) {
@@ -142,38 +142,45 @@ class WhatsAppWebhookController extends Controller
             if (!empty($matches[0])) {
                 foreach ($matches[0] as $url) {
                     if (preg_match('/\.(jpg|jpeg|png|gif)$/i', $url)) {
-                        $imageUrl = $url;
+                        $imageUrls[] = $url;
                         // Remove image URL from text body
-                        $textBody = trim(str_replace($url, '', $reply));
-                        break;
+                        $textBody = trim(str_replace($url, '', $textBody));
                     }
                 }
             }
         }
 
         $sendResponse = null;
-        // Send image if found
-        if ($imageUrl) {
-            $payload = [
-                'messaging_product' => 'whatsapp',
-                'to' => $from,
-                'type' => 'image',
-                'image' => ['link' => $imageUrl],
-            ];
-            $sendResponse = Http::withToken($whatsappAccessToken)
-                ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
-        }
-
-        // Send text if present (and not just the image URL)
-        if (!empty($textBody)) {
-            $payload = [
-                'messaging_product' => 'whatsapp',
-                'to' => $from,
-                'type' => 'text',
-                'text' => ['body' => $textBody],
-            ];
-            $sendResponse = Http::withToken($whatsappAccessToken)
-                ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
+        // Send each image with the textBody as caption (if any)
+        if (!empty($imageUrls)) {
+            foreach ($imageUrls as $imageUrl) {
+                $payload = [
+                    'messaging_product' => 'whatsapp',
+                    'to' => $from,
+                    'type' => 'image',
+                    'image' => [
+                        'link' => $imageUrl,
+                    ],
+                ];
+                // Add caption if there is text left
+                if (!empty($textBody)) {
+                    $payload['image']['caption'] = $textBody;
+                }
+                $sendResponse = Http::withToken($whatsappAccessToken)
+                    ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
+            }
+        } else {
+            // If no images, send as text
+            if (!empty($textBody)) {
+                $payload = [
+                    'messaging_product' => 'whatsapp',
+                    'to' => $from,
+                    'type' => 'text',
+                    'text' => ['body' => $textBody],
+                ];
+                $sendResponse = Http::withToken($whatsappAccessToken)
+                    ->post("https://graph.facebook.com/v19.0/{$phoneNumberId}/messages", $payload);
+            }
         }
 
         Log::info('WhatsApp Webhook: Sent reply to WhatsApp user', [
