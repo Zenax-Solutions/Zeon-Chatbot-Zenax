@@ -57,7 +57,7 @@ class ChatBotApiController extends Controller
                     - Use line breaks and bullet points for clarity.
                     - Emphasize important words using CAPS if needed (but use sparingly).
                     - Provide direct contact info in clean format (e.g., Phone: +94XXXXXXXXX, Email: name@email.com).
-                    - Add emojis for buttons like: 
+                    - Add emojis for buttons like:
                     - 📞 Call Us: +94XXXXXXXXX
                     - 💬 WhatsApp: https://wa.me/94XXXXXXXXX
                     - 🌐 Website: example.com
@@ -72,35 +72,21 @@ class ChatBotApiController extends Controller
                     🤖 Zeon (respond as if you're chatting on WhatsApp — human, friendly, and helpful):
                     PROMPT;
 
-
-        // Build context messages (optional: accept from request, else just use current message)
-        $contextMessages = [];
-        if ($request->has('messages') && is_array($request->input('messages'))) {
-            foreach ($request->input('messages') as $msg) {
-                if (!isset($msg['type'], $msg['content'])) continue;
-                if ($msg['type'] === 'sent') {
-                    $contextMessages[] = new MessageData(
-                        role: RoleType::USER,
-                        content: strip_tags($msg['content'])
-                    );
-                } elseif ($msg['type'] === 'received') {
-                    $contextMessages[] = new MessageData(
-                        role: RoleType::ASSISTANT,
-                        content: strip_tags($msg['content'])
-                    );
-                }
-            }
-        }
-
-        // Limit context history to last 10 entries
+        // --- Session-based memory using cache ---
         $historyLimit = 10;
-        $contextMessages = array_slice($contextMessages, -$historyLimit);
+        $sessionKey = "chatbot_session_{$chatbot->id}_{$user->id}";
 
-        // Add current user question
+        // Retrieve session history from cache
+        $contextMessages = cache()->get($sessionKey, []);
+
+        // Add current user message
         $contextMessages[] = new MessageData(
             role: RoleType::USER,
             content: $userMessage
         );
+
+        // Limit context history to last N entries (excluding system prompt)
+        $contextMessages = array_slice($contextMessages, -$historyLimit);
 
         // Add prompt as system message at the beginning
         array_unshift($contextMessages, new MessageData(
@@ -119,6 +105,16 @@ class ChatBotApiController extends Controller
         } catch (\Exception $e) {
             $reply = '⚠️ Zeon is temporarily unavailable. Please try again later.';
         }
+
+        // Add bot reply to session history (for next turn)
+        // Remove the system prompt before saving
+        $contextMessages = array_slice($contextMessages, 1);
+        $contextMessages[] = new MessageData(
+            role: RoleType::ASSISTANT,
+            content: $reply
+        );
+        // Save updated history to cache
+        cache()->put($sessionKey, $contextMessages, now()->addHours(2));
 
         return response()->json([
             'reply' => $reply,
