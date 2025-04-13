@@ -36,7 +36,7 @@ new class extends Component
         }
         // Use guest IP for session isolation per chatbot
 
-        if ($this->message === '') {
+        if ($this->message != '') {
             $guestIp = request()->ip();
 
             $session = ChatSession::firstOrCreate(
