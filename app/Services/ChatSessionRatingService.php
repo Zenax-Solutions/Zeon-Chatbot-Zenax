@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ChatSession;
 use App\Models\ChatMessage;
+use Illuminate\Support\Arr;
 use MoeMizrak\LaravelOpenrouter\Facades\LaravelOpenRouter;
 use MoeMizrak\LaravelOpenrouter\DTO\MessageData;
 use MoeMizrak\LaravelOpenrouter\DTO\ChatData;
@@ -61,34 +62,29 @@ PROMPT;
             model: 'openrouter/optimus-alpha'
         );
 
-        try {
-            $response = LaravelOpenRouter::chatRequest($chatData);
 
-            if (
-                isset($response->choices[0]->message->content)
-            ) {
-                $raw = trim($response->choices[0]->message->content);
+        $response = LaravelOpenRouter::chatRequest($chatData);
 
-                // Try to decode JSON
-                $parsed = json_decode($raw, true);
+        $raw =  Arr::get($response->choices[0], 'message.content', '🙇‍♂️ Sorry, something went wrong.');
 
-                if (
-                    is_array($parsed) &&
-                    isset($parsed['score']) &&
-                    isset($parsed['reason']) &&
-                    is_numeric($parsed['score']) &&
-                    $parsed['score'] >= 0 &&
-                    $parsed['score'] <= 1
-                ) {
-                    return [
-                        'score' => (float) $parsed['score'],
-                        'reason' => $parsed['reason']
-                    ];
-                }
-            }
-        } catch (\Exception $e) {
-            logger()->error('Lead analysis failed: ' . $e->getMessage());
+        // Try to decode JSON
+        $parsed = json_decode($raw, true);
+
+        if (
+            is_array($parsed) &&
+            isset($parsed['score']) &&
+            isset($parsed['reason']) &&
+            is_numeric($parsed['score']) &&
+            $parsed['score'] >= 0 &&
+            $parsed['score'] <= 1
+        ) {
+            return [
+                'score' => (float) $parsed['score'],
+                'reason' => $parsed['reason']
+            ];
         }
+
+
 
         return null;
     }

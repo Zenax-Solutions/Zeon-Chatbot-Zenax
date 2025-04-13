@@ -35,13 +35,11 @@ class ChatSession extends Model
             $service = app(\App\Services\ChatSessionRatingService::class);
             $result = $service->analyzeLeadPotential($this->id); // updated method name
 
-            dd($result);
-
             if (!$result || !isset($result['score'])) {
                 return 'Unknown';
             }
 
-            return $result['score'] >= 0.7 ? 'Positive' : 'Not Positive';
+            return $result['score'] >= 0.7 ? 'Positive' : 'NotPositive';
         });
     }
 }

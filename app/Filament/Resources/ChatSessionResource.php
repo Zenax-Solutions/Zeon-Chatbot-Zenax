@@ -45,7 +45,7 @@ class ChatSessionResource extends Resource
                     ->label('Lead Status')
                     ->colors([
                         'success' => 'Positive',
-                        'secondary' => 'Not Positive',
+                        'secondary' => 'NotPositive',
                         'warning' => 'Unknown',
                     ])
             ])
