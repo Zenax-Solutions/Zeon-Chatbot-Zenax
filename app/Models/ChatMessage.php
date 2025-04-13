@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatMessage extends Model
 {
+    /**
+     * Touch the parent ChatSession when this message is created/updated.
+     */
+    protected $touches = ['chatSession'];
+
     protected $fillable = [
         'chat_session_id',
         'user_id',
