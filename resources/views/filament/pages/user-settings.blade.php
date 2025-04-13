@@ -7,7 +7,6 @@
 
             {{-- Profile Settings --}}
             <div class="flex-1 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-md transition">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">My Profile Settings</h2>
 
                 @if (session()->has('success'))
                 <div class="bg-emerald-100 dark:bg-emerald-800 border border-emerald-400 dark:border-emerald-600 text-emerald-700 dark:text-emerald-100 text-center px-4 py-3 rounded mb-6 font-medium">
