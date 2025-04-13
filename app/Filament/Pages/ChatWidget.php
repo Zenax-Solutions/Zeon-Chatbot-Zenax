@@ -28,7 +28,7 @@ class ChatWidget extends Page
     {
         $user = Auth::user();
         $this->sessions = ChatSession::where('user_id', $user->id)
-            ->orderBy('updated_at', 'asc')
+            ->orderBy('updated_at', 'desc')
             ->get();
         $sessionId = request()->query('session');
         if ($sessionId) {
