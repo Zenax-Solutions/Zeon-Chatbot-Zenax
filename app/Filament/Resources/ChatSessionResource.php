@@ -36,12 +36,18 @@ class ChatSessionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('Session ID'),
-                Tables\Columns\TextColumn::make('user.name')->label('User')->sortable(),
                 Tables\Columns\TextColumn::make('chatBot.website_name')->label('ChatBot')->sortable(),
                 Tables\Columns\TextColumn::make('title')->limit(30),
                 Tables\Columns\TextColumn::make('guest_ip')->label('Guest IP')->limit(30),
                 Tables\Columns\TextColumn::make('messages_count')->counts('messages')->label('Messages'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                \Filament\Tables\Columns\BadgeColumn::make('lead_status')
+                    ->label('Lead Status')
+                    ->colors([
+                        'success' => 'Positive',
+                        'secondary' => 'Not Positive',
+                        'warning' => 'Unknown',
+                    ])
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
