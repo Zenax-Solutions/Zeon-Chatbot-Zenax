@@ -35,19 +35,23 @@ new class extends Component
             $session = ChatSession::find($chatSessionId);
         }
         // Use guest IP for session isolation per chatbot
-        $guestIp = request()->ip();
 
-        $session = ChatSession::firstOrCreate(
-            [
-                'user_id' => $this->user ? $this->user->id : null,
-                'chat_bot_id' => $chatbot->id,
-                'guest_ip' => $guestIp,
-            ],
-            [
-                'title' => 'Chat with ' . $chatbot->website_name,
-            ]
-        );
-        $this->sessionId = $session->id;
+        if ($this->message === '') {
+            $guestIp = request()->ip();
+
+            $session = ChatSession::firstOrCreate(
+                [
+                    'user_id' => $this->user ? $this->user->id : null,
+                    'chat_bot_id' => $chatbot->id,
+                    'guest_ip' => $guestIp,
+                ],
+                [
+                    'title' => 'Chat with ' . $chatbot->website_name,
+                ]
+            );
+            $this->sessionId = $session->id;
+        }
+
 
         // Load previous messages from the database
         $this->messages = ChatMessage::where('chat_session_id', $session->id)
