@@ -34,6 +34,51 @@ class ChatSessionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                \Filament\Tables\Actions\Action::make('analyzeAllLeadPotential')
+                    ->label('Analyze All Lead Potentials')
+                    ->icon('heroicon-o-sparkles')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->modalHeading('Analyze All Lead Potentials')
+                    ->modalDescription('This will analyze all chat sessions using AI and update the lead status for sessions that are new or have new messages. Continue?')
+                    ->action(function ($livewire) {
+                        $service = app(\App\Services\ChatSessionRatingService::class);
+                        $sessions = method_exists($livewire, 'getFilteredTableQuery')
+                            ? $livewire->getFilteredTableQuery()->get()
+                            : \App\Models\ChatSession::query()->get();
+                        $updated = 0;
+                        foreach ($sessions as $session) {
+                            // Get latest message timestamp
+                            $latestMessage = $session->messages()->latest('created_at')->first();
+                            $latestMessageAt = $latestMessage ? $latestMessage->created_at : null;
+
+                            $shouldAnalyze = false;
+                            if ($session->lead_score === null) {
+                                $shouldAnalyze = true;
+                            } elseif ($session->lead_score_updated_at === null) {
+                                $shouldAnalyze = true;
+                            } elseif ($latestMessageAt && $latestMessageAt->gt($session->lead_score_updated_at)) {
+                                $shouldAnalyze = true;
+                            }
+
+                            if ($shouldAnalyze) {
+                                $result = $service->analyzeLeadPotential($session->id);
+                                if ($result && isset($result['score'])) {
+                                    $session->lead_score = $result['score'];
+                                    $session->lead_score_updated_at = now();
+                                    $session->save();
+                                    $updated++;
+                                }
+                            }
+                        }
+                        \Filament\Notifications\Notification::make()
+                            ->title('Lead analysis complete')
+                            ->body("Updated $updated chat sessions.")
+                            ->success()
+                            ->send();
+                    })
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('Session ID'),
                 Tables\Columns\TextColumn::make('chatBot.website_name')->label('ChatBot')->sortable(),
@@ -59,6 +104,32 @@ class ChatSessionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\Action::make('analyzeLeadPotential')
+                    ->label('Analyze Lead Potential')
+                    ->icon('heroicon-o-sparkles')
+                    ->action(function ($record) {
+                        $service = app(\App\Services\ChatSessionRatingService::class);
+                        $result = $service->analyzeLeadPotential($record->id);
+                        if ($result && isset($result['score'])) {
+                            $record->lead_score = $result['score'];
+                            $record->save();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Lead analysis complete')
+                                ->body('Lead score: ' . $result['score'] . "\nReason: " . $result['reason'])
+                                ->success()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Lead analysis failed')
+                                ->body('Could not analyze this chat session.')
+                                ->danger()
+                                ->send();
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Analyze Lead Potential')
+                    ->modalDescription('This will analyze the chat session using AI and update the lead status. Continue?')
+                    ->color('primary')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

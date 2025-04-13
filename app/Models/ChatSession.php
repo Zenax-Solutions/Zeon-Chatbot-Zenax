@@ -6,11 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatSession extends Model
 {
+    protected $casts = [
+        'lead_score_updated_at' => 'datetime',
+    ];
     protected $fillable = [
         'user_id',
         'chat_bot_id',
         'guest_ip',
         'title',
+        'lead_score',
+        'lead_score_updated_at',
     ];
 
     public function user()
@@ -29,17 +34,9 @@ class ChatSession extends Model
     }
     public function getLeadStatusAttribute()
     {
-        $cacheKey = 'lead_status_' . $this->id;
-
-        return cache()->remember($cacheKey, 300, function () {
-            $service = app(\App\Services\ChatSessionRatingService::class);
-            $result = $service->analyzeLeadPotential($this->id); // updated method name
-
-            if (!$result || !isset($result['score'])) {
-                return 'Unknown';
-            }
-
-            return $result['score'] >= 0.7 ? 'Positive' : 'NotPositive';
-        });
+        if ($this->lead_score === null) {
+            return 'Unknown';
+        }
+        return $this->lead_score >= 0.7 ? 'Positive' : 'Not Positive';
     }
 }
