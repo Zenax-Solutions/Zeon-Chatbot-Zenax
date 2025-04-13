@@ -31,8 +31,6 @@ class ChatWidget extends Page
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        dd($this->sessions);
-
         $sessionId = request()->query('session');
         if ($sessionId) {
             $this->selectedSession = ChatSession::where('user_id', $user->id)->find($sessionId);
