@@ -22,6 +22,7 @@ new class extends Component
 
     public $placeholder = false;
     public $sessionId = null;
+    public $guestIp = null;
 
     public function mount($chatbot, $user, $website)
     {
@@ -36,27 +37,16 @@ new class extends Component
         }
         // Use guest IP for session isolation per chatbot
 
-        if ($this->message != '') {
-            $guestIp = request()->ip();
-
-            $session = ChatSession::firstOrCreate(
-                [
-                    'user_id' => $this->user ? $this->user->id : null,
-                    'chat_bot_id' => $chatbot->id,
-                    'guest_ip' => $guestIp,
-                ],
-                [
-                    'title' => 'Chat with ' . $chatbot->website_name,
-                ]
-            );
-            $this->sessionId = $session->id;
-        }
+        $this->guestIp = request()->ip();
 
 
         // Load previous messages from the database
-        $this->messages = ChatMessage::where('chat_session_id', $session->id)
-            ->orderBy('created_at')
-            ->get()
+        $this->messages = ChatSession::where('guest_ip', $this->guestIp)
+            ->latest('created_at') // get the latest session
+            ->with(['messages' => function ($query) {
+                $query->orderBy('created_at');
+            }])
+            ->first()?->messages
             ->map(function ($msg) {
                 return [
                     'type' => $msg->sent_by === 'user' ? 'sent' : 'received',
@@ -79,6 +69,19 @@ new class extends Component
 
     public function send()
     {
+
+        $session = ChatSession::firstOrCreate(
+            [
+                'user_id' => $this->user ? $this->user->id : null,
+                'chat_bot_id' => $this->chatbot->id,
+                'guest_ip' => $this->guestIp,
+            ],
+            [
+                'title' => 'Chat with ' . $this->chatbot->website_name,
+            ]
+        );
+        $this->sessionId = $session->id;
+
         $content = trim($this->message);
         if ($content === '' || !$this->sessionId) return;
 
