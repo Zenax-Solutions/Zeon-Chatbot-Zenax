@@ -41,7 +41,7 @@ new class extends Component
 
 
         // Load previous messages from the database
-        $this->messages = ChatSession::where('guest_ip', $this->guestIp)
+        $this->messages = ChatSession::where('chat_bot_id', $this->chatbot->id)->where('guest_ip', $this->guestIp)
             ->latest('created_at') // get the latest session
             ->with(['messages' => function ($query) {
                 $query->orderBy('created_at');
