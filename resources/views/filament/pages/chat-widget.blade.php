@@ -26,7 +26,7 @@
                             </span>
                             <span class="text-xs text-gray-500 flex gap-2">
                                 <span class="font-mono text-blue-600">#{{ $session->id }}</span>
-                                <span>{{ $session->created_at->format('Y-m-d H:i') }}</span>
+                                <span>{{ $session->updated_at->format('Y-m-d H:i') }}</span>
                             </span>
                         </span>
                     </a>
