@@ -8,7 +8,18 @@
                 </div>
 
                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    V1.0
+                    <span style="
+                            background-color: #FEF3C7;
+                            color: #92400E;
+                            font-size: 10px;
+                            font-weight: 600;
+                            padding: 2px 6px;
+                            border-radius: 9999px;
+                            display: inline-block;
+                        ">
+                        Beta v1.0
+                    </span>
+
                 </p>
             </div>
 
