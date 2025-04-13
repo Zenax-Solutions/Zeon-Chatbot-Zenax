@@ -35,6 +35,8 @@ class ChatSession extends Model
             $service = app(\App\Services\ChatSessionRatingService::class);
             $result = $service->analyzeLeadPotential($this->id); // updated method name
 
+            dd($result);
+
             if (!$result || !isset($result['score'])) {
                 return 'Unknown';
             }
