@@ -416,9 +416,6 @@ new class extends Component
             setInterval(() => {
                 if (userInteracting) return;
 
-                const msgInput = document.getElementById('message');
-                if (msgInput) msgInput.value = '';
-
                 const bottomMarker = document.getElementById('bottom-marker');
                 if (bottomMarker) {
                     bottomMarker.scrollIntoView({
