@@ -27,7 +27,7 @@ class CheckOpenRouterUptime extends Command
             );
             $chatData = new ChatData(
                 messages: [$messageData],
-                model: 'openrouter/optimus-alpha'
+                model: 'meta-llama/llama-3.2-3b-instruct:free'
             );
             $response = LaravelOpenRouter::chatRequest($chatData);
 
