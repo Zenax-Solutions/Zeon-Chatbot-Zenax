@@ -199,7 +199,7 @@ new class extends Component
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'google/gemma-3-4b-it:free',
+            model: 'meta-llama/llama-4-maverick:free',
         );
 
         try {
