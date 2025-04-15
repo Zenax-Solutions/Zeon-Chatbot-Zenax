@@ -199,7 +199,7 @@ new class extends Component
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'arliai/qwq-32b-arliai-rpr-v1:free',
+            model: 'openai/gpt-4.1-nano',
         );
 
         try {

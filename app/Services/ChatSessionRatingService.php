@@ -59,7 +59,7 @@ PROMPT;
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'meta-llama/llama-3.2-3b-instruct:free'
+            model: 'openai/gpt-4.1-nano'
         );
 
 
