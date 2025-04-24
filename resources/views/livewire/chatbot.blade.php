@@ -199,7 +199,7 @@ new class extends Component
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'google/gemini-flash-1.5-8b-exp',
+            model: 'openai/gpt-4.1-nano',
         );
 
         try {
