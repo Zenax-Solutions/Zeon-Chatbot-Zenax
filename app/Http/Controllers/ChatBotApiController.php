@@ -96,7 +96,7 @@ class ChatBotApiController extends Controller
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'meta-llama/llama-3.2-3b-instruct:free',
+            model: 'google/gemini-2.0-flash-exp:free',
         );
 
         try {
