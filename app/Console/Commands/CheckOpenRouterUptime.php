@@ -27,7 +27,7 @@ class CheckOpenRouterUptime extends Command
             );
             $chatData = new ChatData(
                 messages: [$messageData],
-                model: 'google/gemini-2.0-flash-exp:free'
+                model: 'openai/gpt-4.1-nano'
             );
             $response = LaravelOpenRouter::chatRequest($chatData);
 

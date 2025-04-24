@@ -96,7 +96,7 @@ class ChatBotApiController extends Controller
 
         $chatData = new ChatData(
             messages: $contextMessages,
-            model: 'google/gemini-2.0-flash-exp:free',
+            model: 'openai/gpt-4.1-nano',
         );
 
         try {
