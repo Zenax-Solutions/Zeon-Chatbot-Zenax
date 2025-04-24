@@ -130,6 +130,8 @@ new class extends Component
         - If you cannot find relevant information in the data, reply with: "🙇‍♂️ Sorry, I cannot answer that question based on our current business data."
 
         🎨 Formatting Rules:
+        - Return a clean and well spaces.
+        - Use <p> for paragraphs, <ul>/<li> for lists.
         - Convert only:
           - phone numbers to "tel:" links with a "📞 Call Us" button
           - WhatsApp numbers to "https://wa.me/" links with a "💬 WhatsApp" button with onean a new tab
@@ -141,6 +143,19 @@ new class extends Component
           - image card should be wrapped in <div> tags with class "image-card" and contain a <p> tag for the caption.
           - audio should be wrapped in <audio> tags with controls.
           - audio should be wrapped in <div> tags with class "audio-card" and contain a <p> tag for the caption.
+        
+        - DO NOT nest <a> tags inside another <a>
+        - DO NOT use double quotes inside attributes
+        - Do not overuse divs — keep structure minimal and clean
+        - Never output broken or invalid HTML
+        - Do not use <script> tags or any JavaScript
+        - Do not use <style> tags or any CSS
+        - Do not use <head> or <body> tags
+        - Do not use <html> tags
+        - Do not use <meta> tags
+        - Do not use <link> tags
+        - Do not use <title> tags
+        - Do not use <svg> tags
         
         📚 Business Data:
         $businessInfo
