@@ -362,7 +362,7 @@ new class extends Component
         </div>
 
         <!-- Scrollable Message Section -->
-        <div class="flex-1 overflow-y-auto px-4 py-2 space-y-4" id="chat-container">
+        <div wire:poll.10s.keep-alive class="flex-1 overflow-y-auto px-4 py-2 space-y-4" id="chat-container">
             @foreach ($messages as $msg)
             <div class="animate-fade-in transition-all duration-300" x-transition.opacity>
                 @if ($msg['type'] === 'received')
