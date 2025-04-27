@@ -10,6 +10,7 @@ use Carbon\Carbon;
 class MonthlyChatSessionsChart extends ChartWidget
 {
     public static string $chartType = 'line';
+    protected static ?string $pollingInterval = null;
 
     protected static ?string $heading = 'Monthly Chat Sessions';
     protected static ?string $maxHeight = '200px';
