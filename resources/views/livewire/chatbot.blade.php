@@ -81,6 +81,7 @@ new class extends Component
             ]
         );
         $this->sessionId = $session->id;
+        session()->put('chat_session_id', $this->sessionId);
 
         $content = trim($this->message);
         if ($content === '' || !$this->sessionId) return;
@@ -200,6 +201,8 @@ new class extends Component
         $chatData = new ChatData(
             messages: $contextMessages,
             model: 'google/gemini-2.0-flash-lite-001',
+            temperature: 0.7,
+            top_p: 0.7,
         );
 
         try {
@@ -216,6 +219,9 @@ new class extends Component
             'message' => $reply,
             'sent_by' => 'bot',
         ]);
+
+        // 👉 Trigger frontend typing animation
+        $this->dispatchBrowserEvent('start-typing', ['reply' => $reply]);
 
         $this->messages[] = [
             'type' => 'received',
@@ -245,7 +251,7 @@ new class extends Component
 
 ?>
 
-<div x-data="{}" x-clock>
+<div x-data="chatBot()" x-clock>
 
     <style>
         @keyframes blink {
@@ -290,18 +296,6 @@ new class extends Component
             animation: fadeInUp 0.3s ease-out;
         }
 
-        @keyframes blink {
-
-            0%,
-            80%,
-            100% {
-                opacity: 0;
-            }
-
-            40% {
-                opacity: 1;
-            }
-        }
 
         .dot-anim {
             animation: blink 1.4s infinite;
@@ -356,7 +350,11 @@ new class extends Component
 
                     <div class="ml-3 bg-gray-100 p-3 rounded-lg max-w-[75%] w-fit overflow-x-hidden hover:shadow-lg transition-shadow duration-300 animate-fade-in">
                         <div class="text-sm text-gray-800 prose prose-sm ">
+                            @if ($loop->last && $placeholder)
+                            <span x-text="typingContent"></span>
+                            @else
                             {!! $msg['content'] !!}
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -509,5 +507,42 @@ new class extends Component
             if (input) input.value = sessionId;
         });
     </script>
+
+    <script>
+        function chatBot() {
+            return {
+                typingContent: '',
+                isTyping: false,
+                typeReply(fullText) {
+                    this.typingContent = '';
+                    this.isTyping = true;
+                    let index = 0;
+                    const typingSpeed = 30; // milliseconds per character (adjust speed here)
+
+                    const interval = setInterval(() => {
+                        if (index < fullText.length) {
+                            this.typingContent += fullText[index];
+                            index++;
+                        } else {
+                            clearInterval(interval);
+                            this.isTyping = false;
+                            this.typingContent = ''; // reset after done
+                        }
+                    }, typingSpeed);
+                }
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener('start-typing', event => {
+            const reply = event.detail.reply;
+            const chatbot = document.querySelector('[x-data]');
+            if (chatbot && chatbot.__x) {
+                chatbot.__x.$data.typeReply(reply);
+            }
+        });
+    </script>
+
 
 </div>
