@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ChatSession;
 use App\Models\ChatMessage;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Poll;
 
 class ChatWidget extends Page
 {
@@ -25,6 +26,7 @@ class ChatWidget extends Page
     public $selectedSession;
     public $messages;
     public $agentReply = '';
+    public $lastMessageTimestamp;
 
     public function mount()
     {
@@ -43,10 +45,25 @@ class ChatWidget extends Page
         $this->messages = $this->selectedSession
             ? $this->selectedSession->messages()->orderBy('created_at')->get()
             : collect();
+
+        $this->lastMessageTimestamp = $this->messages->last()?->created_at;
     }
 
+    #[Poll(period: '3s')]
     protected function getViewData(): array
     {
+        if ($this->selectedSession) {
+            $newMessages = $this->selectedSession->messages()
+                ->orderBy('created_at')
+                ->where('created_at', '>', $this->lastMessageTimestamp ?? 0)
+                ->get();
+
+            if ($newMessages->count() > 0) {
+                $this->messages = $this->messages->concat($newMessages);
+                $this->lastMessageTimestamp = $this->messages->last()?->created_at;
+            }
+        }
+
         return [
             'sessions' => $this->sessions,
             'selectedSession' => $this->selectedSession,
