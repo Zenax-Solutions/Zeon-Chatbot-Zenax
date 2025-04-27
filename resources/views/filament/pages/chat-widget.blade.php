@@ -37,7 +37,7 @@
             </ul>
         </div>
         <!-- Chat Log -->
-        <div class="flex-1 flex flex-col">
+        <div wire:poll.keep-alive class="flex-1 flex flex-col">
             <div class="flex-1 overflow-y-auto px-4 py-2 space-y-4 h-[65vh] bg-white" id="chat-container">
                 @if ($selectedSession)
                 @forelse ($messages as $message)
@@ -101,13 +101,3 @@
         @endif
     </div>
 </x-filament-panels::page>
-
-<script>
-    document.addEventListener('livewire:init', () => {
-        Livewire.on('echo-private:chat-session.{{ $selectedSession->id }},message.created', (event) => {
-            Livewire.dispatch('messageReceived', {
-                message: event
-            });
-        });
-    });
-</script>

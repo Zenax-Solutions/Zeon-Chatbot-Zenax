@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ChatSession;
 use App\Models\ChatMessage;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Poll;
 
 class ChatWidget extends Page
 {
@@ -49,7 +48,7 @@ class ChatWidget extends Page
         $this->lastMessageTimestamp = $this->messages->last()?->created_at;
     }
 
-    #[Poll(period: '3s')]
+
     protected function getViewData(): array
     {
         if ($this->selectedSession) {
