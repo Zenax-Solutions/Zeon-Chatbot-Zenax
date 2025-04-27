@@ -83,5 +83,20 @@
                 <div id="bottom-marker" class="h-0"></div>
             </div>
         </div>
+
+        <!-- Agent Reply Input -->
+        @if ($selectedSession)
+        <div class="p-4 border-t bg-gray-50">
+            <form wire:submit.prevent="sendReply" class="flex items-center gap-2">
+                <x-filament::forms.text-input
+                    wire:model="agentReply"
+                    placeholder="Type your reply..."
+                    class="flex-1" />
+                <x-filament::button type="submit">
+                    Send
+                </x-filament::button>
+            </form>
+        </div>
+        @endif
     </div>
 </x-filament-panels::page>

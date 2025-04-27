@@ -23,6 +23,7 @@ class ChatWidget extends Page
     public $sessions;
     public $selectedSession;
     public $messages;
+    public $agentReply = '';
 
     public function mount()
     {
@@ -50,5 +51,20 @@ class ChatWidget extends Page
             'selectedSession' => $this->selectedSession,
             'messages' => $this->messages,
         ];
+    }
+    public function sendReply()
+    {
+        $user = Auth::user();
+
+        $message = new ChatMessage();
+        $message->chat_session_id = $this->selectedSession->id;
+        $message->user_id = $user->id;
+        $message->message = $this->agentReply;
+        $message->sent_by = 'agent';
+        $message->save();
+
+        $this->agentReply = '';
+
+        $this->messages = $this->selectedSession->messages()->orderBy('created_at')->get();
     }
 }
