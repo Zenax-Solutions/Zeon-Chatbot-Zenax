@@ -101,3 +101,13 @@
         @endif
     </div>
 </x-filament-panels::page>
+
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('echo-private:chat-session.{{ $selectedSession->id }},message.created', (event) => {
+            Livewire.dispatch('messageReceived', {
+                message: event
+            });
+        });
+    });
+</script>

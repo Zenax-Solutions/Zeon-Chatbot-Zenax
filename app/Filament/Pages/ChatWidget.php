@@ -7,6 +7,7 @@ use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ChatSession;
 use App\Models\ChatMessage;
+use Livewire\Attributes\On;
 
 class ChatWidget extends Page
 {
@@ -66,5 +67,12 @@ class ChatWidget extends Page
         $this->agentReply = '';
 
         $this->messages = $this->selectedSession->messages()->orderBy('created_at')->get();
+    }
+
+    #[On('messageReceived')]
+    public function messageReceived($event)
+    {
+        $newMessage = (object) $event['message'];
+        $this->messages->push($newMessage);
     }
 }
