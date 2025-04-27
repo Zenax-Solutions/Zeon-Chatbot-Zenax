@@ -344,7 +344,7 @@ new class extends Component
         src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
         type="module"></script>
 
-    <div wire:poll.10s.keep-alive x-transition style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);"
+    <div x-transition style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);"
         class="fixed bottom-[calc(6rem+1.5rem)] left-2 right-2 lg:left-auto lg:right-4 bg-white p-0 rounded-lg border border-[#e5e7eb] w-full h-[550px] lg:w-[480px] lg:h-[500px]  flex flex-col">
 
         <!-- Sticky Header -->
@@ -412,12 +412,12 @@ new class extends Component
         </div>
 
         {{-- Handover to Agent Button --}}
-        <div class="border-t border-gray-200 p-4">
+        <!-- <div class="border-t border-gray-200 p-4">
             <button wire:click="handoverToAgent"
                 class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] bg-amber-500 hover:bg-[#111827E6] h-10 px-4 py-2">
                 Request Handover
             </button>
-        </div>
+        </div> -->
 
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
