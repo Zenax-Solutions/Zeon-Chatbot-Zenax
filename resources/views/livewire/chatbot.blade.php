@@ -23,6 +23,7 @@ new class extends Component
     public $placeholder = false;
     public $sessionId = null;
     public $guestIp = null;
+    public $handoverActive = false;
 
     public function mount($chatbot, $user, $website)
     {
@@ -103,6 +104,11 @@ new class extends Component
         $this->placeholder = true;
 
         $this->dispatch('scroll-chat');
+
+        if ($this->handoverActive) {
+            return;
+        }
+
         $this->dispatch('chat-response', userMessage: $content);
     }
 
@@ -237,6 +243,7 @@ new class extends Component
     public function handoverToAgent()
     {
         $this->dispatch('handover-to-agent');
+        $this->handoverActive = true;
     }
 
     #[On('handover-to-agent')]
