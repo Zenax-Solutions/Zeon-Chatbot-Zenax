@@ -139,11 +139,11 @@ new class extends Component
           - emails to "mailto:" links with an "📧 Email Us" button
           - website URLs to buttons labeled "🌐 Visit Website"
           - address to "https://www.google.com/maps/search/?api=1&query=" links with a "📍 View on Map" button
-          - Use <a> tags for links, and ensure they open in a new tab.
-          - images should be wrapped in <figure> tags with <figcaption> for captions.
-          - image card should be wrapped in <div> tags with class "image-card" and contain a <p> tag for the caption.
-          - audio should be wrapped in <audio> tags with controls.
-          - audio should be wrapped in <div> tags with class "audio-card" and contain a <p> tag for the caption.
+        - Use <a> tags for links, and ensure they open in a new tab.
+        - images should be wrapped in <figure> tags with <figcaption> for captions.
+        - image card should be wrapped in <div> tags with class "image-card" and contain a <p> tag for the caption.
+        - audio should be wrapped in <audio> tags with controls.
+        - audio should be wrapped in <div> tags with class "audio-card" and contain a <p> tag for the caption.
         
         - DO NOT nest <a> tags inside another <a>
         - DO NOT use double quotes inside attributes
@@ -230,6 +230,13 @@ new class extends Component
 
         $this->dispatch('recived-sound');
         $this->dispatch('scroll-chat');
+
+        session(['handoverNeeded' => $response['handover_needed'] ?? false]);
+    }
+
+    public function handoverToAgent()
+    {
+        $this->dispatch('handover-to-agent');
     }
 
     private function retrieveRelevantInfo()
@@ -379,6 +386,15 @@ new class extends Component
             <div id="bottom-marker" class="h-0"></div>
         </div>
 
+        {{-- Handover to Agent Button --}}
+        @if (session('handoverNeeded'))
+        <div class="border-t border-gray-200 p-4">
+            <button wire:click="handoverToAgent"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] bg-amber-500 hover:bg-[#111827E6] h-10 px-4 py-2">
+                Handover to Agent
+            </button>
+        </div>
+        @endif
 
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
@@ -472,8 +488,6 @@ new class extends Component
             audio.play().catch(e => console.error("Audio play failed:", e));
         });
     </script>
-
-
 
     <script>
         // Session expires after 1 hour (3600 seconds)

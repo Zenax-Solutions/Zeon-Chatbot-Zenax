@@ -116,8 +116,11 @@ class ChatBotApiController extends Controller
         // Save updated history to cache
         cache()->put($sessionKey, $contextMessages, now()->addHours(2));
 
+        $handoverNeeded = strpos($reply, '🙇‍♂️ Sorry, I cannot answer that question based on our current business data.') !== false || strpos($reply, '⚠️ Zeon is temporarily unavailable. Please try again later.') !== false;
+
         return response()->json([
             'reply' => $reply,
+            'handover_needed' => $handoverNeeded,
         ]);
     }
 
