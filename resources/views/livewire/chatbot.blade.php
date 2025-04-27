@@ -110,9 +110,10 @@ new class extends Component
                 'type' => 'received',
                 'content' => 'Please wait, connecting you to a human agent...',
             ];
+            $this->placeholder = false;
+        } else {
+            $this->dispatch('chat-response', userMessage: $content);
         }
-
-        $this->dispatch('chat-response', userMessage: $content);
     }
 
     #[On('chat-response')]
