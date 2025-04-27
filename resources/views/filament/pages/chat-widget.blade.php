@@ -88,13 +88,14 @@
         @if ($selectedSession)
         <div class="p-4 border-t bg-gray-50">
             <form wire:submit.prevent="sendReply" class="flex items-center gap-2">
-                <x-filament::forms.text-input
+                <input
                     wire:model="agentReply"
+                    type="text"
                     placeholder="Type your reply..."
-                    class="flex-1" />
-                <x-filament::button type="submit">
+                    class="flex-1 border rounded-md p-2" />
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md">
                     Send
-                </x-filament::button>
+                </button>
             </form>
         </div>
         @endif
