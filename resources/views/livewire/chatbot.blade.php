@@ -131,7 +131,7 @@ new class extends Component
         - If you cannot find relevant information in the data, reply with: "🙇‍♂️ Sorry, I cannot answer that question based on our current business data."
 
         🎨 Formatting Rules:
-        - Return a clean and well spaces.
+        - Return a clean and well spaces with <p> tags.
         - Use <p> for paragraphs, <ul>/<li> for lists.
         - Convert only:
           - phone numbers to "tel:" links with a "📞 Call Us" button
