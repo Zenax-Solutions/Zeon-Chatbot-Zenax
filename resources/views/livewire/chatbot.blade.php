@@ -221,7 +221,7 @@ new class extends Component
         ]);
 
         // 👉 Trigger frontend typing animation
-        $this->dispatchBrowserEvent('start-typing', ['reply' => $reply]);
+        $this->dispatch('start-typing', ['reply' => $reply]);
 
         $this->messages[] = [
             'type' => 'received',
