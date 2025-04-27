@@ -106,7 +106,7 @@ new class extends Component
         $this->dispatch('scroll-chat');
 
         if ($this->handoverActive) {
-            return;
+            return 'Please wait, connecting you to a human agent...';
         }
 
         $this->dispatch('chat-response', userMessage: $content);
