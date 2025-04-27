@@ -120,7 +120,6 @@ class ChatBotApiController extends Controller
 
         return response()->json([
             'reply' => $reply,
-            'handover_needed' => $handoverNeeded,
         ]);
     }
 

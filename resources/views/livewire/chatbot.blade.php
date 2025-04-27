@@ -231,7 +231,7 @@ new class extends Component
         $this->dispatch('recived-sound');
         $this->dispatch('scroll-chat');
 
-        session(['handoverNeeded' => $response->handover_needed ?? false]);
+        session(['handoverNeeded' => false]);
     }
 
     public function handoverToAgent()
@@ -387,14 +387,12 @@ new class extends Component
         </div>
 
         {{-- Handover to Agent Button --}}
-        @if (session('handoverNeeded'))
         <div class="border-t border-gray-200 p-4">
             <button wire:click="handoverToAgent"
                 class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] bg-amber-500 hover:bg-[#111827E6] h-10 px-4 py-2">
-                Handover to Agent
+                Request Handover
             </button>
         </div>
-        @endif
 
         <!-- Input Box (Fixed at bottom) -->
         <div class="border-t border-gray-200 p-4">
