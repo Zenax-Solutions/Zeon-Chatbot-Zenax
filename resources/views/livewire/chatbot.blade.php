@@ -239,6 +239,20 @@ new class extends Component
         $this->dispatch('handover-to-agent');
     }
 
+    #[On('handover-to-agent')]
+    public function initiateHandover()
+    {
+        // Add logic to initiate the handover process here
+        // This could involve:
+        // - Displaying a message to the user
+        // - Sending a notification to an agent
+        // - Redirecting the user to a different page
+        $this->messages[] = [
+            'type' => 'received',
+            'content' => 'Please wait, connecting you to a human agent...',
+        ];
+    }
+
     private function retrieveRelevantInfo()
     {
         try {
