@@ -231,7 +231,7 @@ new class extends Component
         $this->dispatch('recived-sound');
         $this->dispatch('scroll-chat');
 
-        session(['handoverNeeded' => $response['handover_needed'] ?? false]);
+        session(['handoverNeeded' => $response->handover_needed ?? false]);
     }
 
     public function handoverToAgent()
