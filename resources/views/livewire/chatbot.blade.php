@@ -344,7 +344,7 @@ new class extends Component
         src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
         type="module"></script>
 
-    <div x-transition style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);"
+    <div wire:poll.10s.keep-alive x-transition style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);"
         class="fixed bottom-[calc(6rem+1.5rem)] left-2 right-2 lg:left-auto lg:right-4 bg-white p-0 rounded-lg border border-[#e5e7eb] w-full h-[550px] lg:w-[480px] lg:h-[500px]  flex flex-col">
 
         <!-- Sticky Header -->
@@ -362,7 +362,7 @@ new class extends Component
         </div>
 
         <!-- Scrollable Message Section -->
-        <div wire:poll.10s.keep-alive class="flex-1 overflow-y-auto px-4 py-2 space-y-4" id="chat-container">
+        <div class="flex-1 overflow-y-auto px-4 py-2 space-y-4" id="chat-container">
             @foreach ($messages as $msg)
             <div class="animate-fade-in transition-all duration-300" x-transition.opacity>
                 @if ($msg['type'] === 'received')
